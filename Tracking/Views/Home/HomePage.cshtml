@@ -1,0 +1,88 @@
+﻿@model Tracking.Models.Home
+
+<style>
+    .nav.nav-pills.nav-danger .nav-link.active {
+        color: #fff;
+        background-color: #3699ff !important;
+    }
+
+    .nav-item {
+        min-width: 180px;
+        width: min-content;
+        cursor: pointer;
+        border-radius: 20px;
+    }
+
+    .nav-link {
+        height: fit-content !important;
+    }
+
+    .dashboard-tabs {
+        width: max-content !important;
+    }
+
+    .nav.nav-pills.nav-danger .nav-link.active .svg-icon path {
+        fill: white;
+    }
+
+    .svg-icon path {
+        fill: #4691f6;
+    }
+</style>
+<div class="card card-custom">
+    <div class="card-body">
+        <input asp-for="UserID" asp-all-route-data="@Model.UserID" type="hidden" />
+
+        <div class="bg-white p-8 rounded card-custom overflow-auto d-flex justify-content-center">
+            <ul class="dashboard-tabs nav nav-pills nav-danger row row-paddingless m-0 p-0  flex-column flex-sm-row" role="tablist">
+                <li class="nav-item d-flex col-sm flex-grow-1 flex-shrink-0 mr-3 mb-3 mb-lg-0">
+                    <span onclick="LoadContent(1)" class="nav-link border py-10 d-flex flex-grow-1 rounded flex-column align-items-center active" data-toggle="pill" href="#tab_forms_widget_1">
+                        <span class="nav-icon py-2 w-auto">
+                            <span class="svg-icon svg-icon-primary svg-icon-4x">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-credit-card-2-front" viewBox="0 0 16 16">
+                                    <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2z" />
+                                    <path d="M2 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z" />
+                                </svg>
+                            </span>
+                        </span>
+                        <span class="nav-text font-size-lg py-2 font-weight-bold font-size-h5 text-center">Credit Card</span>
+                    </span>
+                </li>
+                <li class="nav-item d-flex col-sm flex-grow-1 flex-shrink-0 mr-3 mb-3 mb-lg-0">
+                    <span onclick="LoadContent(2)" class="nav-link border py-10 d-flex flex-grow-1 rounded flex-column align-items-center" data-toggle="pill" href="#tab_forms_widget_1">
+                        <span class="nav-icon py-2 w-auto">
+
+                            <span class="svg-icon svg-icon-primary svg-icon-4x">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-credit-card-fill" viewBox="0 0 16 16">
+                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1H0V4zm0 3v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7H0zm3 2h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1z" />
+                                </svg>
+                            </span>
+                        </span>
+                        <span class="nav-text font-size-lg py-2 font-weight-bold font-size-h5 text-center">Debit Card</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+
+
+        <div id="kt_replace1">
+
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+        var userid = $("#UserID").val();
+        $('#kt_replace1').load('@Url.Action("Credit", new { ide = Model.UserID })')
+
+        function LoadContent(id) {
+                    if (id == 1) {
+                        $('#kt_replace1').load('@Url.Action("Credit", new { ide = Model.UserID })')
+                    } else {
+                        $('#kt_replace1').load('@Url.Action("Debit", new { ide = Model.UserID })')
+                    }
+        }
+    </script>
+}

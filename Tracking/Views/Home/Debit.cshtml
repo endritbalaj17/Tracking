@@ -1,0 +1,89 @@
+﻿@model Tracking.Models.Debit
+@inject Tracking.Repository.IDDLRepository repository;
+@{
+    ViewData["Title"] = "Debit";
+}
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<br />
+<div class="card card-custom">
+    <div class="card-body">
+        <input asp-for="ide" asp-all-route-data="@Model.ide" type="hidden" />
+
+        <h6>Fill the required information</h6>
+        <hr />
+        <form id="forma1" asp-action="Debit" enctype="multipart/form-data" class="form" method="post" data-ajax="true" data-ajax-method="post" data-ajax-success="Debit">
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="SenderID" class="required"></label>
+                    <select asp-for="SenderID" asp-items="@await repository.LoadSenders(@Model.ide)" class="form-control select2" style="width:100%">
+                        <option value="">Choose Sender</option>
+                    </select>
+                    <span asp-validation-for="SenderID" class="text-danger" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ReceiverID" class="required"></label>
+                    <select asp-for="ReceiverID" asp-items="@await repository.LoadReceivers(@Model.ide)" class="form-control select2" style="width:100%">
+                        <option value="">Choose Receiver</option>
+                    </select>
+                    <span asp-validation-for="ReceiverID" class="text-danger" />
+                </div>
+            </div>
+
+            <h6 class="mt-3">Amount and reason for the transaction</h6>
+            <hr />
+            <div class="row">
+                <div class="input-group ml-3 mt-3 mb-3">
+                    <span class="input-group-text">$</span>
+                    <input asp-for="Price" type="text" class="form-control col-md-4" aria-label="Amount (to the nearest dollar)">
+                    <span class="input-group-text">.00</span>
+                </div>
+                <div class="input-group ml-3 mr-3">
+                    <span class="input-group-text">Reason</span>
+                    <textarea asp-for="Reason" class="form-control" aria-label="Reason"></textarea>
+                </div>
+            </div>
+            <div class="text-center text-lg-start mt-4 pt-2">
+                <button type="submit" class="btn btn-primary btn-lg"
+                        style="padding-left: 2.5rem; padding-right: 2.5rem; margin-bottom:2px;">
+                    Finish
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var form = $('#forma1');
+        form.removeData('validator');
+        form.removeData('unobtrusiveValidation');
+        $.validator.unobtrusive.parse(form);
+        $('.select2').select2({ width: '100%' });
+    });
+
+    function Debit(data) {
+        debugger
+        if (data.title == "Success") {
+
+            Swal.fire({
+                icon: 'success',
+                title: data.title,
+                text: data.errorDescription,
+                confirmButtonText: "Okay"
+            }).then(t => {
+                window.location.reload()
+            })
+
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: data.title,
+                text: data.errorDescription,
+            })
+        }
+    }
+</script>
