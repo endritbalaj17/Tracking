@@ -28,9 +28,33 @@ namespace Tracking.Controllers
             return View();
         }
 
-        public IActionResult Stats()
+        public async Task<IActionResult> StatsAsync(int ide)
         {
-            return View();
+            Stats stats = new Stats();
+            stats.UserID = ide;
+            if(ide != 3)
+            {
+                var senderPrices = await context.Transactions.Where(e => e.SenderID == ide).Select(e => e.Price).ToListAsync();
+                stats.CountSenderMoney = senderPrices.Sum(x => Convert.ToDecimal(x));
+                var senderReceives = await context.Transactions.Where(e => e.ReceiverID == ide).Select(e => e.Price).ToListAsync();
+                stats.CountReceiverMoney = senderReceives.Sum(x => Convert.ToDecimal(x));
+                stats.Count = stats.CountReceiverMoney- stats.CountSenderMoney;
+            }
+            else
+            {
+                var query = context.Transactions
+                   .GroupBy(e => e.SenderID)
+                   .Select(g => new ListKey{ key = g.Key, count = g.Sum(e => e.Price) });
+
+                stats.CountList = query.Select(q => new ListKey
+                {
+                    count = q.count,
+                    key = q.key
+                }).ToList();
+
+            }
+
+            return View(stats);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

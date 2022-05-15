@@ -55,6 +55,9 @@
         </form>
     </div>
 </div>
+<div class="d-grid">
+    <button type="button" id="Statistics" class="btn btn-outline-info btn-block">Statistics</button>
+</div>
 
 <script type="text/javascript">
     $(document).ready(function () {
@@ -86,4 +89,9 @@
             })
         }
     }
+      $("#Statistics").click(function () {
+        debugger
+        var id = $("#ide").val();
+        window.location.href = '@Url.Action("Stats")?ide=' + id;
+    });
 </script>

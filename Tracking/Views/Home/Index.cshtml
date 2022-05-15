@@ -21,8 +21,9 @@
                         <span asp-validation-for="Username" class="text-danger"></span>
                     </div>
                     <div class="form-outline mb-4">
-                        <label asp-for="Password" class="required"></label>
-                        <input asp-for="Password" class="form-control" />
+
+                        <label asp-for="Password" class="required form-label" for="typePassword">Password input</label>
+                        <input type="password" asp-for="Password" class="form-control" />
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
                     <div class="text-center text-lg-start mt-4 pt-2">
