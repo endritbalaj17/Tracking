@@ -75,11 +75,12 @@ namespace Tracking.Controllers
         [HttpPost]
         public async Task<ActionResult<Credit>> Credit(Credit credit)
         {
-            var user = await context.Users.ToListAsync();
-            var userBudget = user.Where(e => e.UserID == credit.SenderID).Select(e => e.Budget).FirstOrDefault();
+            var user = await context.Users.ToListAsync(); 
             var transactions = await context.Transactions
-                .SingleOrDefaultAsync(x => x.SenderID == credit.SenderID || x.ReceiverID == credit.SenderID || x.SenderID == credit.ReceiverID || x.ReceiverID == credit.ReceiverID);
-            
+                .Where(x => x.SenderID == credit.SenderID || x.ReceiverID == credit.SenderID || x.SenderID == credit.ReceiverID || x.ReceiverID == credit.ReceiverID).FirstOrDefaultAsync();
+
+            var userBudget = user.Where(e => e.UserID == credit.SenderID).Select(e => e.Budget).FirstOrDefault();
+           
             if (transactions != null)
             {
                 credit.Error = "There is only one transaction for account allowed in the system!";
@@ -125,10 +126,12 @@ namespace Tracking.Controllers
         [HttpPost]
         public async Task<ActionResult<Debit>> Debit(Debit debit)
         {
+
             var user = await context.Users.ToListAsync();
-            var userBudget = user.Where(e => e.UserID == debit.SenderID).Select(e => e.Budget).FirstOrDefault();
             var transactions = await context.Transactions
-                .SingleOrDefaultAsync(x => x.SenderID == debit.SenderID || x.ReceiverID == debit.SenderID || x.SenderID == debit.ReceiverID || x.ReceiverID == debit.ReceiverID);
+                .Where(x => x.SenderID == debit.SenderID || x.ReceiverID == debit.SenderID || x.SenderID == debit.ReceiverID || x.ReceiverID == debit.ReceiverID).FirstOrDefaultAsync();
+
+            var userBudget = user.Where(e => e.UserID == debit.SenderID).Select(e => e.Budget).FirstOrDefault();
 
             if (transactions != null)
             {
