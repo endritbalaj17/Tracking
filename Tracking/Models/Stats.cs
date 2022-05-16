@@ -11,13 +11,14 @@ namespace Tracking.Models
         public string Username { get; set; }
         public decimal CountSenderMoney { get; set; }
         public decimal CountReceiverMoney { get; set; }
-        public decimal Count{ get; set; }
-        public List<ListKey> CountList{ get; set; }
+        public decimal Count { get; set; }
+
 
     }
     public class ListKey
     {
 
+        public int type { get; set; }
         public int key { get; set; }
         public decimal count{ get; set; }
 

@@ -37,12 +37,13 @@
             <div class="row">
                 <div class="input-group ml-3 mt-3 mb-3">
                     <span class="input-group-text">$</span>
-                    <input asp-for="Price" type="text" class="form-control col-md-4" aria-label="Amount (to the nearest dollar)">
+                    <input asp-for="Price" type="text" value="" class="form-control col-md-4" aria-label="Amount (to the nearest dollar)" min="1">
                     <span class="input-group-text">.00</span>
                 </div>
                 <div class="input-group ml-3 mr-3">
                     <span class="input-group-text">Reason</span>
                     <textarea asp-for="Reason" class="form-control" aria-label="Reason"></textarea>
+                    <span asp-validation-for="Reason" class="text-danger" />
                 </div>
             </div>
             <div class="text-center text-lg-start mt-4 pt-2">

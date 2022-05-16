@@ -28,35 +28,6 @@ namespace Tracking.Controllers
             return View();
         }
 
-        public async Task<IActionResult> StatsAsync(int ide)
-        {
-            Stats stats = new Stats();
-            stats.UserID = ide;
-            if(ide != 3)
-            {
-                var senderPrices = await context.Transactions.Where(e => e.SenderID == ide).Select(e => e.Price).ToListAsync();
-                stats.CountSenderMoney = senderPrices.Sum(x => Convert.ToDecimal(x));
-                var senderReceives = await context.Transactions.Where(e => e.ReceiverID == ide).Select(e => e.Price).ToListAsync();
-                stats.CountReceiverMoney = senderReceives.Sum(x => Convert.ToDecimal(x));
-                stats.Count = stats.CountReceiverMoney- stats.CountSenderMoney;
-            }
-            else
-            {
-                var query = context.Transactions
-                   .GroupBy(e => e.SenderID)
-                   .Select(g => new ListKey{ key = g.Key, count = g.Sum(e => e.Price) });
-
-                stats.CountList = query.Select(q => new ListKey
-                {
-                    count = q.count,
-                    key = q.key
-                }).ToList();
-
-            }
-
-            return View(stats);
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -104,7 +75,8 @@ namespace Tracking.Controllers
         [HttpPost]
         public async Task<ActionResult<Credit>> Credit(Credit credit)
         {
-            var userBudget = await context.Users.Where(e => e.UserID == credit.SenderID).Select(e => e.Budget).FirstOrDefaultAsync();
+            var user = await context.Users.ToListAsync();
+            var userBudget = user.Where(e => e.UserID == credit.SenderID).Select(e => e.Budget).FirstOrDefault();
             var transactions = await context.Transactions
                 .SingleOrDefaultAsync(x => x.SenderID == credit.SenderID || x.ReceiverID == credit.SenderID || x.SenderID == credit.ReceiverID || x.ReceiverID == credit.ReceiverID);
             
@@ -120,7 +92,7 @@ namespace Tracking.Controllers
 
                 return Json(new ErrorViewModel { Title = "Failed", ErrorDescription = credit.Error });
             }
-
+            
             context.Transactions.Add(new Transactions
             {
                 SenderID = credit.SenderID,
@@ -129,6 +101,10 @@ namespace Tracking.Controllers
                 Reason = credit.Reason,
                 CreatedAt = DateTime.Now
             });
+            var updateSenderBudget = user.Where(e => e.UserID == credit.SenderID).FirstOrDefault();
+            updateSenderBudget.Budget = (long)(updateSenderBudget.Budget - credit.Price);
+            var updateReceiverBudget = user.Where(e => e.UserID == credit.ReceiverID).FirstOrDefault();
+            updateReceiverBudget.Budget = (long)(updateReceiverBudget.Budget + credit.Price);
 
             await context.SaveChangesAsync();
 
@@ -149,7 +125,8 @@ namespace Tracking.Controllers
         [HttpPost]
         public async Task<ActionResult<Debit>> Debit(Debit debit)
         {
-            var userBudget = await context.Users.Where(e => e.UserID == debit.SenderID).Select(e => e.Budget).FirstOrDefaultAsync();
+            var user = await context.Users.ToListAsync();
+            var userBudget = user.Where(e => e.UserID == debit.SenderID).Select(e => e.Budget).FirstOrDefault();
             var transactions = await context.Transactions
                 .SingleOrDefaultAsync(x => x.SenderID == debit.SenderID || x.ReceiverID == debit.SenderID || x.SenderID == debit.ReceiverID || x.ReceiverID == debit.ReceiverID);
 
@@ -174,12 +151,48 @@ namespace Tracking.Controllers
                 Reason = debit.Reason,
                 CreatedAt = DateTime.Now
             });
+            var updateSenderBudget = user.Where(e => e.UserID == debit.SenderID).FirstOrDefault();
+            updateSenderBudget.Budget = (long)(updateSenderBudget.Budget - debit.Price);
+            var updateReceiverBudget = user.Where(e => e.UserID == debit.ReceiverID).FirstOrDefault();
+            updateReceiverBudget.Budget = (long)(updateReceiverBudget.Budget + debit.Price);
 
             await context.SaveChangesAsync();
 
             return Json(new ErrorViewModel { Title = "Success", ErrorDescription = "The transaction is finished!" });
         }
 
+        public async Task<IActionResult> StatsAsync(int ide)
+        {
+            Stats stats = new Stats();
+            stats.UserID = ide;
+            if (ide != 3)
+            {
+                var senderPrices = await context.Transactions.Where(e => e.SenderID == ide).Select(e => e.Price).ToListAsync();
+                stats.CountSenderMoney = senderPrices.Sum(x => Convert.ToDecimal(x));
+                var senderReceives = await context.Transactions.Where(e => e.ReceiverID == ide).Select(e => e.Price).ToListAsync();
+                stats.CountReceiverMoney = senderReceives.Sum(x => Convert.ToDecimal(x));
+                stats.Count = stats.CountReceiverMoney - stats.CountSenderMoney;
+            }
+            else
+            {
+                // sum of price for every sender
+                var querySender = context.Transactions
+                   .GroupBy(e => e.SenderID)
+                   .Select(g => new ListKey { key = g.Key, count = g.Sum(e => e.Price), type = 1 });
 
+                stats.CountSenderMoney = querySender.Sum(q => q.count);
+
+                // sum of price for every receiver
+                var queryReceiver = context.Transactions
+               .GroupBy(e => e.ReceiverID)
+               .Select(g => new ListKey { key = g.Key, count = g.Sum(e => e.Price), type = 2 });
+
+                stats.CountReceiverMoney = queryReceiver.Sum(q => q.count);
+                stats.Count = stats.CountReceiverMoney - stats.CountSenderMoney;
+
+            }
+
+            return View(stats);
+        }
     }
 }

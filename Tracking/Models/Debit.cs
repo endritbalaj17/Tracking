@@ -7,7 +7,9 @@ namespace Tracking.Models
     {
         public int ide { get; set; }
         public int TransactionID { get; set; }
+        [Required]
         public int SenderID { get; set; }
+        [Required]
         public int ReceiverID { get; set; }
         public decimal Price { get; set; }
         public string Reason { get; set; }
